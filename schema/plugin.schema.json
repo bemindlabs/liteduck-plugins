@@ -54,6 +54,30 @@
       "default": false,
       "description": "Opt-in: when true, LiteDuck adds an activity-rail icon (using `icon`) that opens the plugin's page. Honored once LITEDUCK-37 ships."
     },
+    "ui": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entry"],
+      "description": "Optional executable UI (ADR-002). When present, LiteDuck renders the plugin through the isolated `plugin://` UI host using this bundle instead of the built-in declarative views. The bundle is a single self-contained ES module shipped in the plugin folder; it runs in a sandboxed, cross-origin iframe with no host/Tauri access and talks to LiteDuck only via the postMessage bridge. See liteduck `docs/adr-002-plugin-ui-extension-host.md` + `notes/2026-05-28_plugin-ui-host-design.md`, and the `sdk/` authoring guide.",
+      "properties": {
+        "entry": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[^/\\\\]+$",
+          "not": { "pattern": "\\.\\." },
+          "description": "Bundle filename relative to the plugin dir (e.g. `ui.js`). Bare filename only — no path separators or `..` (loader rejects traversal)."
+        },
+        "height": {
+          "type": "string",
+          "description": "Height hint for panel surfaces (`full` or a px value). Page surfaces fill the editor area."
+        },
+        "fallback": {
+          "type": "string",
+          "enum": ["declarative"],
+          "description": "What to do if the bundle fails to load. `declarative` falls back to the built-in views. Absent → `declarative`."
+        }
+      }
+    },
     "paths": {
       "type": "array",
       "default": [],

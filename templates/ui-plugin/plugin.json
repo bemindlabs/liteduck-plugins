@@ -1,0 +1,21 @@
+{
+  "id": "my-ui-plugin",
+  "name": "My UI Plugin",
+  "version": "0.1.0",
+  "description": "Starter template for a LiteDuck plugin that ships its own UI (ADR-002).",
+  "kind": "tool",
+  "network": false,
+  "surface": "page",
+  "icon": "boxes",
+  "pinned": true,
+  "ui": { "entry": "ui.js", "fallback": "declarative" },
+  "commands": [
+    {
+      "id": "my-ui-plugin.hello",
+      "title": "Hello",
+      "run": "printf '%s' '{\"message\":\"Hello from the plugin shell command\"}'",
+      "view": "keyvalue",
+      "default": true
+    }
+  ]
+}

@@ -53,6 +53,23 @@ the schema level, not by review discipline. Do not submit such a plugin.
   `chmod 600`, gitignored) or in an environment variable — never in this repo.
 - Scripts must never echo, log, or emit secrets into stdout JSON.
 
+## 4b. Shipping a plugin with its own UI (optional)
+
+Commands render through LiteDuck's built-in **declarative views** by default
+(`view: table | keyvalue | …`). A plugin that needs richer/interactive UI may
+instead ship an **executable UI** (ADR-002): declare `ui: { entry: "ui.js" }` and
+include a self-contained bundle. It runs in an isolated `plugin://` iframe
+(sandboxed, cross-origin, no host/Tauri access, no network) and talks to LiteDuck
+only via the `window.liteduck` bridge.
+
+- Authoring guide + typed bridge: [`sdk/`](sdk/) (`sdk/README.md`, `sdk/bridge.d.ts`).
+- Copy-paste starter: [`templates/ui-plugin/`](templates/ui-plugin/).
+- Set `"ui": true` on your `registry.json` entry so the install UI shows the
+  executable-UI consent step.
+
+Prefer declarative views unless you genuinely need custom UI — keep an executable
+UI's commands' `view` hints set so the `fallback: "declarative"` path stays useful.
+
 ## 5. Checklist — add a plugin to the registry
 
 1. Create `plugins/<id>/` with:
