@@ -74,6 +74,15 @@
             "default": [],
             "items": { "type": "string" },
             "description": "Declared parameter keys this command accepts (documentation + UI hints)."
+          },
+          "view": {
+            "type": "string",
+            "enum": ["text", "table", "list", "keyvalue", "markdown"],
+            "description": "Declarative-view hint for how the command's stdout is rendered by a trusted built-in renderer (no plugin JS/HTML). Absent or unknown → `text` (raw output). See the per-view output contracts in the liteduck `notes/2026-05-28_plugin-declarative-views.md` design note."
+          },
+          "default": {
+            "type": "boolean",
+            "description": "When true, LiteDuck auto-runs this command as the plugin's landing view when its page is opened. At most one command per plugin should set this."
           }
         }
       }
