@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/bemindlabs/liteduck-plugins/schema/plugin.schema.json",
+  "title": "LiteDuck plugin manifest (plugin.json)",
+  "description": "JSON Schema for a LiteDuck `plugin.json` manifest. Derived from the authoritative loader `PluginManifest` / `ALLOWED_KINDS` / `DENIED_KINDS` in liteduck `src-tauri/src/plugins.rs`. If this schema and plugins.rs ever disagree, plugins.rs wins.",
+  "type": "object",
+  "required": ["id", "name", "version", "kind"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable plugin id. Becomes the install directory name `~/.liteduck/plugins/<id>/`. Must not contain path separators or `..` (loader rejects traversal).",
+      "pattern": "^[^/\\\\]+$",
+      "not": { "pattern": "\\.\\." }
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable display name shown in the Plugins panel."
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Plugin version string (free-form; SemVer recommended)."
+    },
+    "description": {
+      "type": "string",
+      "default": "",
+      "description": "Short description surfaced in the catalog and install UI."
+    },
+    "kind": {
+      "type": "string",
+      "description": "Contribution kind. Allow-list enforced by plugins.rs ALLOWED_KINDS. The kinds `chat`, `agent`, `llm` are on the scope-ceiling deny-list (DENIED_KINDS) and are refused at load time — LiteDuck core has no AI/LLM.",
+      "enum": ["integration", "formatter", "linter", "previewer", "tool"]
+    },
+    "network": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the plugin needs network access. Declared here, surfaced in the install confirmation UI. Not OS-enforced in v1 (user-trust)."
+    },
+    "paths": {
+      "type": "array",
+      "default": [],
+      "items": { "type": "string" },
+      "description": "Host filesystem scopes the plugin declares it needs. Declared + surfaced in the install UI; not OS-enforced in v1."
+    },
+    "commands": {
+      "type": "array",
+      "default": [],
+      "description": "Commands this plugin contributes. Each `run` template is spawned via `sh -c` with the plugin directory as CWD.",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "run"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Command id, unique within the plugin."
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Command palette / menu label."
+          },
+          "run": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Shell command template executed via `sh -c`. UI params are exported as `LITEDUCK_PARAM_<UPPERCASE_KEY>` env vars — never string-interpolated into this template (shell-injection guard)."
+          },
+          "args": {
+            "type": "array",
+            "default": [],
+            "items": { "type": "string" },
+            "description": "Declared parameter keys this command accepts (documentation + UI hints)."
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+# Secrets — never commit a real plugin auth file. Bundled auth.toml files
+# carry empty placeholders only; a user's real credentials live in
+# ~/.liteduck/plugins/<id>/auth.toml (outside this repo).
+**/auth.local.toml
+**/*.secret.toml
+.env
+.env.*
+
+# OS clutter
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+Desktop.ini
+
+# Editor/tooling
+.idea/
+.vscode/
+*.log
