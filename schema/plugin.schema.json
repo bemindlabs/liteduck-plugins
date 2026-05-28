@@ -39,6 +39,21 @@
       "default": false,
       "description": "Whether the plugin needs network access. Declared here, surfaced in the install confirmation UI. Not OS-enforced in v1 (user-trust)."
     },
+    "surface": {
+      "type": "string",
+      "enum": ["panel", "page"],
+      "default": "panel",
+      "description": "Where the plugin renders. `panel` (default) shows in the Plugins panel; `page` renders full-width in the editor-area slot. See the liteduck `notes/2026-05-28_plugin-declarative-views.md` design note (LITEDUCK-37)."
+    },
+    "icon": {
+      "type": "string",
+      "description": "Name from LiteDuck's built-in lucide icon set (e.g. `users`, `square-kanban`). Used for the activity-rail icon when `pinned` is true. Not a shipped SVG."
+    },
+    "pinned": {
+      "type": "boolean",
+      "default": false,
+      "description": "Opt-in: when true, LiteDuck adds an activity-rail icon (using `icon`) that opens the plugin's page. Honored once LITEDUCK-37 ships."
+    },
     "paths": {
       "type": "array",
       "default": [],
