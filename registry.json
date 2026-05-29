@@ -12,8 +12,7 @@
       "author": "bemindlabs",
       "source": "plugins/jira/",
       "tags": ["jira", "atlassian", "issues", "read-only"],
-      "verified": true,
-      "ui": true
+      "verified": true
     },
     {
       "id": "bwoc",
@@ -25,8 +24,7 @@
       "author": "bemindlabs",
       "source": "plugins/bwoc/",
       "tags": ["bwoc", "agents", "orchestration", "read-only"],
-      "verified": true,
-      "ui": true
+      "verified": true
     }
   ]
 }
