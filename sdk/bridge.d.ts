@@ -46,6 +46,15 @@ export interface LiteduckBridge {
   runCommand(commandId: string, params?: Record<string, string>): Promise<CommandResult>;
   /** Forward a log line to LiteDuck's logger (namespaced to your plugin). */
   log(level: "debug" | "info" | "warn" | "error", msg: string): void;
+  /**
+   * Open an external URL via the OS (gated capability). The host enforces:
+   * **`https://` URLs only**, and **only** when your manifest declares
+   * `network: true` (the same capability the install consent surfaced). All
+   * other schemes (`http://`, `file:`, `javascript:`, opaque) are refused; the
+   * URL length is bounded. Errors are surfaced in the host log, not back to
+   * your code — call it as fire-and-forget.
+   */
+  openExternal(url: string): void;
   /** Optional: assign a callback to run when `context` is delivered. */
   onContext?: (context: PluginContext) => void;
 }
