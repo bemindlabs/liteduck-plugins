@@ -1,18 +1,23 @@
 # LiteDuck Plugins
 
 The curated catalog of installable plugins for the [LiteDuck](../liteduck/) desktop
-app. This repository is the canonical source the bundled reference plugins are
-published from; [`registry.json`](registry.json) is the index of every plugin
-available to install.
+app. LiteDuck ships **lean** (no plugins bundled into the app); this repository is
+the single source of truth — [`registry.json`](registry.json) indexes every plugin
+available to install on demand.
 
-## The plugin model (3 lines)
+## The plugin model
 
 LiteDuck uses a **hybrid: declarative manifest + shell command** model — a plugin
 is a folder with a `plugin.json` manifest declaring its commands plus a shell
-script each command spawns. No plugin code runs inside the LiteDuck process; the
-only surfaces are the manifest schema and the script's stdin/stdout contract. See
-the full design rationale in LiteDuck's design note
-[`2026-05-28_plugin-system-design.md`](../liteduck/notes/2026-05-28_plugin-system-design.md).
+script each command spawns. **No plugin code runs in-process** in the LiteDuck
+window: commands are subprocesses, and a plugin's optional executable UI
+(`ui.entry`, see [`sdk/`](sdk/)) runs **out-of-process** in an isolated
+`plugin://` iframe (cross-origin, sandboxed, per-response CSP — no host or Tauri
+access). See LiteDuck's design notes:
+[`2026-05-28_plugin-system-design.md`](../liteduck/notes/2026-05-28_plugin-system-design.md)
+(shell model) and
+[`2026-05-28_plugin-ui-host-design.md`](../liteduck/notes/2026-05-28_plugin-ui-host-design.md)
++ [ADR-002](../liteduck/docs/adr-002-plugin-ui-extension-host.md) (UI host).
 
 ## Browsing the catalog
 
@@ -30,27 +35,29 @@ Each entry in [`registry.json`](registry.json) describes one plugin:
 | `source` | relative path `plugins/<id>/` to the installable folder |
 | `tags` | search keywords |
 | `verified` | whether this catalog has vetted the plugin |
+| `ui` | whether the plugin ships an **executable UI** (ADR-002) — drives the install-time consent step |
 
 The folders under [`plugins/`](plugins/) are the actual installable manifests
 (`plugin.json` + the shell script + `SPEC.md`, and for Jira a placeholder
 `auth.toml`).
 
-## Installing a plugin today
+## Installing a plugin
 
-There is **no live registry server yet**. Install from a local folder:
+LiteDuck installs plugins on demand from this catalog. In the app:
 
-1. Clone or download this repository.
-2. In LiteDuck open the **Plugins** panel → **Install from folder**.
-3. Point it at a `plugins/<id>/` directory (e.g. `plugins/jira/`).
+1. Open the **Plugins** panel → **Available** tab.
+2. Pick a plugin; review its declared capabilities (network, executable UI).
+3. Click **Install** (or **Install anyway** for plugins that ship a UI — the
+   consent step makes the trust decision explicit).
 
-LiteDuck reads the folder's `plugin.json`, validates it, and copies it into
-`~/.liteduck/plugins/<id>/`. The id used is taken from the manifest, never the
-folder name.
+The app fetches + validates the manifest before any file touches disk, then
+copies the plugin into `~/.liteduck/plugins/<id>/`. The id used is taken from
+the validated manifest, never the request path. Existing user-data (e.g.
+`auth.toml` you filled in) is preserved across reinstalls.
 
-> **Future phase (not live):** install-from-URL / marketplace fetch — downloading a
-> plugin from a remote URL into `~/.liteduck/plugins/<id>/`. The `source` field is
-> a relative path for now; remote URLs are a documented future direction with no
-> server behind them today.
+> **Install from a local folder** — the **Install from folder** action stays
+> available for development: point it at a `plugins/<id>/` checkout to install
+> without going through the catalog.
 
 ## Scope-ceiling rule
 
@@ -80,5 +87,11 @@ the catalog's mirror of that contract.
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the manifest rules and the checklist to
-add a plugin to the registry. **Never commit real secrets** — the bundled
-`plugins/jira/auth.toml` ships with empty placeholders only.
+add a plugin to the registry. Want to ship a plugin with its **own UI**? Start
+from the SDK and starter template:
+
+- Authoring guide + typed bridge: [`sdk/`](sdk/) (`sdk/README.md`, `sdk/bridge.d.ts`).
+- Copy-paste starter: [`templates/ui-plugin/`](templates/ui-plugin/).
+
+**Never commit real secrets** — the bundled `plugins/jira/auth.toml` ships with
+empty placeholders only.
